@@ -1,0 +1,17 @@
+package main
+
+var A float
+var B float
+var C float
+var D float
+var E float
+var F float
+var G float
+var H float
+
+func Fragment(position vec4, texCoord vec2, color vec4) vec4 {
+  newX := (A * texCoord.x + B * texCoord.y + C) / (G * texCoord.x + H * texCoord.y + 1)
+  newY := (D * texCoord.x + E * texCoord.y + F) / (G * texCoord.x + H * texCoord.y + 1)
+
+	return imageSrc0At(vec2(newX, newY))
+}
