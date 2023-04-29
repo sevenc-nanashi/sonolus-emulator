@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"time"
 
 	_ "embed"
+	"image"
+	_ "image/png"
 	"net/http"
 
 	_ "net/http/pprof"
@@ -31,6 +34,9 @@ type Game struct {
 
 //go:embed perspectiveShader.kage
 var perspective []byte
+
+//go:embed bread.png
+var breadBytes []byte
 
 var perspectiveShader *ebiten.Shader
 var breadImage *ebiten.Image
@@ -102,7 +108,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		len(g.drawCalls),
 		g.processor.DebugLog,
 	))
-	return
+	// return
 
 	for _, call := range g.drawCalls {
 		// op := &ebiten.DrawRectShaderOptions{}
@@ -197,11 +203,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	breadImage, _, err = ebitenutil.NewImageFromFile("bread.png")
 
+	bread, _, err := image.Decode(bytes.NewReader(breadBytes))
 	if err != nil {
 		panic(err)
 	}
+	breadImage = ebiten.NewImageFromImage(bread)
 
 	processorInstance.Prepare()
 
