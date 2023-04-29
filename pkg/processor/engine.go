@@ -4,15 +4,17 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
 
+var stackLength = map[int]int{}
+
 type Stack struct {
-	Index   int
-	Data    []float64
-	Current int
+	Index     int
+	Data      []float64
+	Current   int
+	NodeIndex int
 
 	Args []int
 	Func string
@@ -41,23 +43,35 @@ func (p *Processor) Execute(status Status, entityIndex int, index int) float64 {
 	p.prepareMemory(entityIndex, status)
 	return p.execute(
 		entityIndex,
-		[]Stack{
-			{
-				Index:   0,
-				Data:    make([]float64, len(nodes[index].Args)),
-				Current: 0,
+		Stack{
+			Index:     0,
+			Data:      make([]float64, len(nodes[index].Args)),
+			Current:   0,
+			NodeIndex: index,
 
-				Args: nodes[index].Args,
-				Func: nodes[index].Func,
-			},
-		})
+			Args: nodes[index].Args,
+			Func: nodes[index].Func,
+		},
+	)
 }
 
-func (p *Processor) execute(entityIndex int, stacks []Stack) float64 {
+func (p *Processor) execute(entityIndex int, firstStack Stack) float64 {
+	length, ok := stackLength[firstStack.NodeIndex]
+	if !ok {
+		length = 1024
+	}
+	stacks := make([]Stack, length)
+	stacks[0] = firstStack
+	currentStack := 1
+  maxStack := 1
+
 	nodes := p.data.EngineData.Nodes
-	for len(stacks) > 0 {
-		stack := stacks[len(stacks)-1]
-		indent := strings.Repeat("  ", len(stacks)-1) + "  "
+	for currentStack > 0 {
+    if currentStack > maxStack {
+      maxStack = currentStack
+    }
+		stack := stacks[currentStack-1]
+		// indent := strings.Repeat("  ", len(stacks)-1) + "  "
 		shouldSkip := false
 		for i := stack.Current; i < len(stack.Data); i++ {
 			if shouldSkip {
@@ -105,14 +119,20 @@ func (p *Processor) execute(entityIndex int, stacks []Stack) float64 {
 				stack.Current++
 				// log.Infof("%s  Value %f", indent, stack.Data[i])
 			} else { // function
-				stacks = append(stacks, Stack{
+        if currentStack >= len(stacks) {
+          stacks = append(stacks, Stack{})
+          stackLength[stack.NodeIndex] = len(stacks)
+        }
+				stacks[currentStack] = Stack{
 					Index:   i,
 					Data:    make([]float64, len(nodes[arg].Args)),
 					Current: 0,
+          NodeIndex: arg,
 
 					Args: nodes[arg].Args,
 					Func: nodes[arg].Func,
-				})
+				}
+				currentStack++
 				break
 			}
 		}
@@ -138,9 +158,9 @@ func (p *Processor) execute(entityIndex int, stacks []Stack) float64 {
 				result = 0
 				id := int(stack.Data[0])
 				index := int(stack.Data[1])
-				permissions, ok := p.memoryPermissions[id]
+				permission, ok := p.memoryWritePermissions[id]
 				if !ok {
-					panic(fmt.Sprintf("Memory %d permissions not found", id))
+					panic(fmt.Sprintf("Memory %d permission not found", id))
 				}
 				memory, ok := p.memories[id]
 				if !ok {
@@ -154,7 +174,7 @@ func (p *Processor) execute(entityIndex int, stacks []Stack) float64 {
 						panic(fmt.Sprintf("Memory %d not found", id))
 					}
 				}
-				if !permissions.Write {
+				if !permission {
 					panic(fmt.Sprintf("Memory %d is not writable", id))
 				}
 
@@ -166,7 +186,7 @@ func (p *Processor) execute(entityIndex int, stacks []Stack) float64 {
 			case "Get":
 				id := int(stack.Data[0])
 				index := int(stack.Data[1])
-				permissions, ok := p.memoryPermissions[id]
+				permission, ok := p.memoryReadPermissions[id]
 				if !ok {
 					panic(fmt.Sprintf("Memory %d permissions not found", id))
 				}
@@ -182,7 +202,7 @@ func (p *Processor) execute(entityIndex int, stacks []Stack) float64 {
 						panic(fmt.Sprintf("Memory %d not found", id))
 					}
 				}
-				if !permissions.Read {
+				if !permission {
 					panic(fmt.Sprintf("Memory %d is not readable", id))
 				}
 
@@ -245,14 +265,16 @@ func (p *Processor) execute(entityIndex int, stacks []Stack) float64 {
 				p.DebugLog = stack.Data[0]
 				break
 			default:
-				log.Warnf("%sUnknown function %s", indent, stack.Func)
+				log.Warnf("Unknown function %s", stack.Func)
 			}
-			stacks = stacks[:len(stacks)-1]
-			if len(stacks) == 0 {
+			stacks[currentStack-1] = Stack{}
+			currentStack--
+			if currentStack == 0 {
+        stackLength[stack.NodeIndex] = maxStack
 				return result
 			}
-			stacks[len(stacks)-1].Current++
-			stacks[len(stacks)-1].Data[stack.Index] = result
+			stacks[currentStack-1].Current++
+			stacks[currentStack-1].Data[stack.Index] = result
 			continue
 		}
 	}

@@ -1,10 +1,5 @@
 package processor
 
-type MemoryPermission struct {
-	Read  bool
-	Write bool
-}
-
 type EntityMemories struct {
 	Memory []float64
 	Input  []float64
@@ -43,219 +38,381 @@ func (p *Processor) initMemories() {
 
 	p.memories[1][2] = p.config.AspectRatio
 	p.EntityMemories = map[int]EntityMemories{}
-  for entityIndex := range p.data.LevelData.Entities {
-    p.EntityMemories[entityIndex] = EntityMemories{
-      Memory: make([]float64, 32),
-      Input:  make([]float64, 4),
-    }
-  }
+	for entityIndex := range p.data.LevelData.Entities {
+		p.EntityMemories[entityIndex] = EntityMemories{
+			Memory: make([]float64, 32),
+			Input:  make([]float64, 4),
+		}
+	}
 }
 
 func (p *Processor) prepareMemory(entityIndex int, status Status) {
-	p.memories[100] = make([]float64, 4096) // Temporary Memory
+	for i := range p.memories[20] {
+		p.memories[20][i] = 0
+	}
 	p.memories[21] = p.EntityMemories[entityIndex].Memory
 	p.memories[23] = p.EntityMemories[entityIndex].Input
 	switch status {
 	case StatusPreprocess:
-		p.memoryPermissions = map[int]MemoryPermission{
-			0:   {Read: true, Write: true},
-			1:   {Read: true, Write: true},
-			2:   {Read: true, Write: true},
-			3:   {Read: true, Write: true},
-			4:   {Read: true, Write: true},
-			5:   {Read: true, Write: true},
-			6:   {Read: true, Write: true},
-			7:   {Read: true, Write: true},
-			8:   {Read: true, Write: true},
-			9:   {Read: true, Write: true},
-			10:  {Read: true, Write: false},
-			11:  {Read: true, Write: true},
-			12:  {Read: true, Write: true},
-			20:  {Read: true, Write: false},
-			21:  {Read: true, Write: true},
-			22:  {Read: true, Write: true},
-			23:  {Read: true, Write: true},
-			24:  {Read: true, Write: true},
-			30:  {Read: true, Write: true},
-			50:  {Read: true, Write: false},
-			100: {Read: true, Write: true},
-			101: {Read: false, Write: false},
-		}
+		p.memoryReadPermissions[0] = true
+		p.memoryReadPermissions[1] = true
+		p.memoryReadPermissions[2] = true
+		p.memoryReadPermissions[3] = true
+		p.memoryReadPermissions[4] = true
+		p.memoryReadPermissions[5] = true
+		p.memoryReadPermissions[6] = true
+		p.memoryReadPermissions[7] = true
+		p.memoryReadPermissions[8] = true
+		p.memoryReadPermissions[9] = true
+		p.memoryReadPermissions[10] = true
+		p.memoryReadPermissions[11] = true
+		p.memoryReadPermissions[12] = true
+		p.memoryReadPermissions[20] = true
+		p.memoryReadPermissions[21] = true
+		p.memoryReadPermissions[22] = true
+		p.memoryReadPermissions[23] = true
+		p.memoryReadPermissions[24] = true
+		p.memoryReadPermissions[30] = true
+		p.memoryReadPermissions[50] = true
+		p.memoryReadPermissions[100] = true
+		p.memoryReadPermissions[101] = false
+		p.memoryWritePermissions[0] = true
+		p.memoryWritePermissions[1] = true
+		p.memoryWritePermissions[2] = true
+		p.memoryWritePermissions[3] = true
+		p.memoryWritePermissions[4] = true
+		p.memoryWritePermissions[5] = true
+		p.memoryWritePermissions[6] = true
+		p.memoryWritePermissions[7] = true
+		p.memoryWritePermissions[8] = true
+		p.memoryWritePermissions[9] = true
+		p.memoryWritePermissions[10] = false
+		p.memoryWritePermissions[11] = true
+		p.memoryWritePermissions[12] = true
+		p.memoryWritePermissions[20] = false
+		p.memoryWritePermissions[21] = true
+		p.memoryWritePermissions[22] = true
+		p.memoryWritePermissions[23] = true
+		p.memoryWritePermissions[24] = true
+		p.memoryWritePermissions[30] = true
+		p.memoryWritePermissions[50] = false
+		p.memoryWritePermissions[100] = true
+		p.memoryWritePermissions[101] = false
 	case StatusSpawnOrder:
-		p.memoryPermissions = map[int]MemoryPermission{
-			0:   {Read: true, Write: false},
-			1:   {Read: true, Write: false},
-			2:   {Read: true, Write: false},
-			3:   {Read: true, Write: false},
-			4:   {Read: true, Write: false},
-			5:   {Read: true, Write: false},
-			6:   {Read: true, Write: false},
-			7:   {Read: true, Write: false},
-			8:   {Read: true, Write: false},
-			9:   {Read: true, Write: false},
-			10:  {Read: true, Write: false},
-			11:  {Read: true, Write: false},
-			12:  {Read: true, Write: false},
-			20:  {Read: true, Write: false},
-			21:  {Read: true, Write: true},
-			22:  {Read: true, Write: false},
-			23:  {Read: true, Write: true},
-			24:  {Read: true, Write: false},
-			30:  {Read: true, Write: false},
-			50:  {Read: true, Write: false},
-			100: {Read: true, Write: true},
-			101: {Read: false, Write: false},
-		}
+		p.memoryReadPermissions[0] = true
+		p.memoryReadPermissions[1] = true
+		p.memoryReadPermissions[2] = true
+		p.memoryReadPermissions[3] = true
+		p.memoryReadPermissions[4] = true
+		p.memoryReadPermissions[5] = true
+		p.memoryReadPermissions[6] = true
+		p.memoryReadPermissions[7] = true
+		p.memoryReadPermissions[8] = true
+		p.memoryReadPermissions[9] = true
+		p.memoryReadPermissions[10] = true
+		p.memoryReadPermissions[11] = true
+		p.memoryReadPermissions[12] = true
+		p.memoryReadPermissions[20] = true
+		p.memoryReadPermissions[21] = true
+		p.memoryReadPermissions[22] = true
+		p.memoryReadPermissions[23] = true
+		p.memoryReadPermissions[24] = true
+		p.memoryReadPermissions[30] = true
+		p.memoryReadPermissions[50] = true
+		p.memoryReadPermissions[100] = true
+		p.memoryReadPermissions[101] = false
+		p.memoryWritePermissions[0] = false
+		p.memoryWritePermissions[1] = false
+		p.memoryWritePermissions[2] = false
+		p.memoryWritePermissions[3] = false
+		p.memoryWritePermissions[4] = false
+		p.memoryWritePermissions[5] = false
+		p.memoryWritePermissions[6] = false
+		p.memoryWritePermissions[7] = false
+		p.memoryWritePermissions[8] = false
+		p.memoryWritePermissions[9] = false
+		p.memoryWritePermissions[10] = false
+		p.memoryWritePermissions[11] = false
+		p.memoryWritePermissions[12] = false
+		p.memoryWritePermissions[20] = false
+		p.memoryWritePermissions[21] = true
+		p.memoryWritePermissions[22] = false
+		p.memoryWritePermissions[23] = true
+		p.memoryWritePermissions[24] = false
+		p.memoryWritePermissions[30] = false
+		p.memoryWritePermissions[50] = false
+		p.memoryWritePermissions[100] = true
+		p.memoryWritePermissions[101] = false
 	case StatusShouldSpawn:
-		p.memoryPermissions = map[int]MemoryPermission{
-			0:   {Read: true, Write: false},
-			1:   {Read: true, Write: false},
-			2:   {Read: true, Write: false},
-			3:   {Read: true, Write: false},
-			4:   {Read: true, Write: false},
-			5:   {Read: true, Write: false},
-			6:   {Read: true, Write: false},
-			7:   {Read: true, Write: false},
-			8:   {Read: true, Write: false},
-			9:   {Read: true, Write: false},
-			10:  {Read: true, Write: false},
-			11:  {Read: true, Write: false},
-			12:  {Read: true, Write: false},
-			20:  {Read: true, Write: false},
-			21:  {Read: true, Write: true},
-			22:  {Read: true, Write: false},
-			23:  {Read: true, Write: true},
-			24:  {Read: true, Write: false},
-			30:  {Read: true, Write: false},
-			50:  {Read: true, Write: false},
-			100: {Read: true, Write: true},
-			101: {Read: false, Write: false},
-		}
+		p.memoryReadPermissions[0] = true
+		p.memoryReadPermissions[1] = true
+		p.memoryReadPermissions[2] = true
+		p.memoryReadPermissions[3] = true
+		p.memoryReadPermissions[4] = true
+		p.memoryReadPermissions[5] = true
+		p.memoryReadPermissions[6] = true
+		p.memoryReadPermissions[7] = true
+		p.memoryReadPermissions[8] = true
+		p.memoryReadPermissions[9] = true
+		p.memoryReadPermissions[10] = true
+		p.memoryReadPermissions[11] = true
+		p.memoryReadPermissions[12] = true
+		p.memoryReadPermissions[20] = true
+		p.memoryReadPermissions[21] = true
+		p.memoryReadPermissions[22] = true
+		p.memoryReadPermissions[23] = true
+		p.memoryReadPermissions[24] = true
+		p.memoryReadPermissions[30] = true
+		p.memoryReadPermissions[50] = true
+		p.memoryReadPermissions[100] = true
+		p.memoryReadPermissions[101] = false
+		p.memoryWritePermissions[0] = false
+		p.memoryWritePermissions[1] = false
+		p.memoryWritePermissions[2] = false
+		p.memoryWritePermissions[3] = false
+		p.memoryWritePermissions[4] = false
+		p.memoryWritePermissions[5] = false
+		p.memoryWritePermissions[6] = false
+		p.memoryWritePermissions[7] = false
+		p.memoryWritePermissions[8] = false
+		p.memoryWritePermissions[9] = false
+		p.memoryWritePermissions[10] = false
+		p.memoryWritePermissions[11] = false
+		p.memoryWritePermissions[12] = false
+		p.memoryWritePermissions[20] = false
+		p.memoryWritePermissions[21] = true
+		p.memoryWritePermissions[22] = false
+		p.memoryWritePermissions[23] = true
+		p.memoryWritePermissions[24] = false
+		p.memoryWritePermissions[30] = false
+		p.memoryWritePermissions[50] = false
+		p.memoryWritePermissions[100] = true
+		p.memoryWritePermissions[101] = false
 	case StatusInitialize:
-		p.memoryPermissions = map[int]MemoryPermission{
-			0:   {Read: true, Write: false},
-			1:   {Read: true, Write: false},
-			2:   {Read: true, Write: false},
-			3:   {Read: true, Write: false},
-			4:   {Read: true, Write: false},
-			5:   {Read: true, Write: false},
-			6:   {Read: true, Write: false},
-			7:   {Read: true, Write: false},
-			8:   {Read: true, Write: false},
-			9:   {Read: true, Write: false},
-			10:  {Read: true, Write: false},
-			11:  {Read: true, Write: false},
-			12:  {Read: true, Write: false},
-			20:  {Read: true, Write: false},
-			21:  {Read: true, Write: true},
-			22:  {Read: true, Write: false},
-			23:  {Read: true, Write: true},
-			24:  {Read: true, Write: false},
-			30:  {Read: true, Write: false},
-			50:  {Read: true, Write: false},
-			100: {Read: true, Write: true},
-			101: {Read: false, Write: false},
-		}
+		p.memoryReadPermissions[0] = true
+		p.memoryReadPermissions[1] = true
+		p.memoryReadPermissions[2] = true
+		p.memoryReadPermissions[3] = true
+		p.memoryReadPermissions[4] = true
+		p.memoryReadPermissions[5] = true
+		p.memoryReadPermissions[6] = true
+		p.memoryReadPermissions[7] = true
+		p.memoryReadPermissions[8] = true
+		p.memoryReadPermissions[9] = true
+		p.memoryReadPermissions[10] = true
+		p.memoryReadPermissions[11] = true
+		p.memoryReadPermissions[12] = true
+		p.memoryReadPermissions[20] = true
+		p.memoryReadPermissions[21] = true
+		p.memoryReadPermissions[22] = true
+		p.memoryReadPermissions[23] = true
+		p.memoryReadPermissions[24] = true
+		p.memoryReadPermissions[30] = true
+		p.memoryReadPermissions[50] = true
+		p.memoryReadPermissions[100] = true
+		p.memoryReadPermissions[101] = false
+		p.memoryWritePermissions[0] = false
+		p.memoryWritePermissions[1] = false
+		p.memoryWritePermissions[2] = false
+		p.memoryWritePermissions[3] = false
+		p.memoryWritePermissions[4] = false
+		p.memoryWritePermissions[5] = false
+		p.memoryWritePermissions[6] = false
+		p.memoryWritePermissions[7] = false
+		p.memoryWritePermissions[8] = false
+		p.memoryWritePermissions[9] = false
+		p.memoryWritePermissions[10] = false
+		p.memoryWritePermissions[11] = false
+		p.memoryWritePermissions[12] = false
+		p.memoryWritePermissions[20] = false
+		p.memoryWritePermissions[21] = true
+		p.memoryWritePermissions[22] = false
+		p.memoryWritePermissions[23] = true
+		p.memoryWritePermissions[24] = false
+		p.memoryWritePermissions[30] = false
+		p.memoryWritePermissions[50] = false
+		p.memoryWritePermissions[100] = true
+		p.memoryWritePermissions[101] = false
 	case StatusUpdateSequential:
-		p.memoryPermissions = map[int]MemoryPermission{
-			0:   {Read: true, Write: true},
-			1:   {Read: true, Write: false},
-			2:   {Read: true, Write: false},
-			3:   {Read: true, Write: true},
-			4:   {Read: true, Write: true},
-			5:   {Read: true, Write: false},
-			6:   {Read: true, Write: false},
-			7:   {Read: true, Write: false},
-			8:   {Read: true, Write: false},
-			9:   {Read: true, Write: false},
-			10:  {Read: true, Write: false},
-			11:  {Read: true, Write: false},
-			12:  {Read: true, Write: true},
-			20:  {Read: true, Write: false},
-			21:  {Read: true, Write: true},
-			22:  {Read: true, Write: false},
-			23:  {Read: true, Write: true},
-			24:  {Read: true, Write: true},
-			30:  {Read: true, Write: false},
-			50:  {Read: true, Write: false},
-			100: {Read: true, Write: true},
-			101: {Read: false, Write: false},
-		}
+		p.memoryReadPermissions[0] = true
+		p.memoryReadPermissions[1] = true
+		p.memoryReadPermissions[2] = true
+		p.memoryReadPermissions[3] = true
+		p.memoryReadPermissions[4] = true
+		p.memoryReadPermissions[5] = true
+		p.memoryReadPermissions[6] = true
+		p.memoryReadPermissions[7] = true
+		p.memoryReadPermissions[8] = true
+		p.memoryReadPermissions[9] = true
+		p.memoryReadPermissions[10] = true
+		p.memoryReadPermissions[11] = true
+		p.memoryReadPermissions[12] = true
+		p.memoryReadPermissions[20] = true
+		p.memoryReadPermissions[21] = true
+		p.memoryReadPermissions[22] = true
+		p.memoryReadPermissions[23] = true
+		p.memoryReadPermissions[24] = true
+		p.memoryReadPermissions[30] = true
+		p.memoryReadPermissions[50] = true
+		p.memoryReadPermissions[100] = true
+		p.memoryReadPermissions[101] = false
+		p.memoryWritePermissions[0] = true
+		p.memoryWritePermissions[1] = false
+		p.memoryWritePermissions[2] = false
+		p.memoryWritePermissions[3] = true
+		p.memoryWritePermissions[4] = true
+		p.memoryWritePermissions[5] = false
+		p.memoryWritePermissions[6] = false
+		p.memoryWritePermissions[7] = false
+		p.memoryWritePermissions[8] = false
+		p.memoryWritePermissions[9] = false
+		p.memoryWritePermissions[10] = false
+		p.memoryWritePermissions[11] = false
+		p.memoryWritePermissions[12] = true
+		p.memoryWritePermissions[20] = false
+		p.memoryWritePermissions[21] = true
+		p.memoryWritePermissions[22] = false
+		p.memoryWritePermissions[23] = true
+		p.memoryWritePermissions[24] = true
+		p.memoryWritePermissions[30] = false
+		p.memoryWritePermissions[50] = false
+		p.memoryWritePermissions[100] = true
+		p.memoryWritePermissions[101] = false
 	case StatusTouch:
-		p.memoryPermissions = map[int]MemoryPermission{
-			0:   {Read: true, Write: true},
-			1:   {Read: true, Write: false},
-			2:   {Read: true, Write: false},
-			3:   {Read: true, Write: true},
-			4:   {Read: true, Write: true},
-			5:   {Read: true, Write: false},
-			6:   {Read: true, Write: false},
-			7:   {Read: true, Write: false},
-			8:   {Read: true, Write: false},
-			9:   {Read: true, Write: false},
-			10:  {Read: true, Write: false},
-			11:  {Read: true, Write: false},
-			12:  {Read: true, Write: true},
-			20:  {Read: true, Write: false},
-			21:  {Read: true, Write: true},
-			22:  {Read: true, Write: false},
-			23:  {Read: true, Write: true},
-			24:  {Read: true, Write: true},
-			30:  {Read: true, Write: false},
-			50:  {Read: true, Write: false},
-			100: {Read: true, Write: true},
-			101: {Read: true, Write: false},
-		}
+		p.memoryReadPermissions[0] = true
+		p.memoryReadPermissions[1] = true
+		p.memoryReadPermissions[2] = true
+		p.memoryReadPermissions[3] = true
+		p.memoryReadPermissions[4] = true
+		p.memoryReadPermissions[5] = true
+		p.memoryReadPermissions[6] = true
+		p.memoryReadPermissions[7] = true
+		p.memoryReadPermissions[8] = true
+		p.memoryReadPermissions[9] = true
+		p.memoryReadPermissions[10] = true
+		p.memoryReadPermissions[11] = true
+		p.memoryReadPermissions[12] = true
+		p.memoryReadPermissions[20] = true
+		p.memoryReadPermissions[21] = true
+		p.memoryReadPermissions[22] = true
+		p.memoryReadPermissions[23] = true
+		p.memoryReadPermissions[24] = true
+		p.memoryReadPermissions[30] = true
+		p.memoryReadPermissions[50] = true
+		p.memoryReadPermissions[100] = true
+		p.memoryReadPermissions[101] = true
+		p.memoryWritePermissions[0] = true
+		p.memoryWritePermissions[1] = false
+		p.memoryWritePermissions[2] = false
+		p.memoryWritePermissions[3] = true
+		p.memoryWritePermissions[4] = true
+		p.memoryWritePermissions[5] = false
+		p.memoryWritePermissions[6] = false
+		p.memoryWritePermissions[7] = false
+		p.memoryWritePermissions[8] = false
+		p.memoryWritePermissions[9] = false
+		p.memoryWritePermissions[10] = false
+		p.memoryWritePermissions[11] = false
+		p.memoryWritePermissions[12] = true
+		p.memoryWritePermissions[20] = false
+		p.memoryWritePermissions[21] = true
+		p.memoryWritePermissions[22] = false
+		p.memoryWritePermissions[23] = true
+		p.memoryWritePermissions[24] = true
+		p.memoryWritePermissions[30] = false
+		p.memoryWritePermissions[50] = false
+		p.memoryWritePermissions[100] = true
+		p.memoryWritePermissions[101] = false
 	case StatusUpdateParallel:
-		p.memoryPermissions = map[int]MemoryPermission{
-			0:   {Read: true, Write: false},
-			1:   {Read: true, Write: false},
-			2:   {Read: true, Write: false},
-			3:   {Read: true, Write: false},
-			4:   {Read: true, Write: false},
-			5:   {Read: true, Write: false},
-			6:   {Read: true, Write: false},
-			7:   {Read: true, Write: false},
-			8:   {Read: true, Write: false},
-			9:   {Read: true, Write: false},
-			10:  {Read: true, Write: false},
-			11:  {Read: true, Write: false},
-			12:  {Read: true, Write: false},
-			20:  {Read: true, Write: false},
-			21:  {Read: true, Write: true},
-			22:  {Read: true, Write: false},
-			23:  {Read: true, Write: true},
-			24:  {Read: true, Write: false},
-			30:  {Read: true, Write: false},
-			50:  {Read: true, Write: false},
-			100: {Read: true, Write: true},
-			101: {Read: false, Write: false},
-		}
+		p.memoryReadPermissions[0] = true
+		p.memoryReadPermissions[1] = true
+		p.memoryReadPermissions[2] = true
+		p.memoryReadPermissions[3] = true
+		p.memoryReadPermissions[4] = true
+		p.memoryReadPermissions[5] = true
+		p.memoryReadPermissions[6] = true
+		p.memoryReadPermissions[7] = true
+		p.memoryReadPermissions[8] = true
+		p.memoryReadPermissions[9] = true
+		p.memoryReadPermissions[10] = true
+		p.memoryReadPermissions[11] = true
+		p.memoryReadPermissions[12] = true
+		p.memoryReadPermissions[20] = true
+		p.memoryReadPermissions[21] = true
+		p.memoryReadPermissions[22] = true
+		p.memoryReadPermissions[23] = true
+		p.memoryReadPermissions[24] = true
+		p.memoryReadPermissions[30] = true
+		p.memoryReadPermissions[50] = true
+		p.memoryReadPermissions[100] = true
+		p.memoryReadPermissions[101] = false
+		p.memoryWritePermissions[0] = false
+		p.memoryWritePermissions[1] = false
+		p.memoryWritePermissions[2] = false
+		p.memoryWritePermissions[3] = false
+		p.memoryWritePermissions[4] = false
+		p.memoryWritePermissions[5] = false
+		p.memoryWritePermissions[6] = false
+		p.memoryWritePermissions[7] = false
+		p.memoryWritePermissions[8] = false
+		p.memoryWritePermissions[9] = false
+		p.memoryWritePermissions[10] = false
+		p.memoryWritePermissions[11] = false
+		p.memoryWritePermissions[12] = false
+		p.memoryWritePermissions[20] = false
+		p.memoryWritePermissions[21] = true
+		p.memoryWritePermissions[22] = false
+		p.memoryWritePermissions[23] = true
+		p.memoryWritePermissions[24] = false
+		p.memoryWritePermissions[30] = false
+		p.memoryWritePermissions[50] = false
+		p.memoryWritePermissions[100] = true
+		p.memoryWritePermissions[101] = false
 	case StatusTerminate:
-		p.memoryPermissions = map[int]MemoryPermission{
-			0:   {Read: true, Write: false},
-			1:   {Read: true, Write: false},
-			2:   {Read: true, Write: false},
-			3:   {Read: true, Write: false},
-			4:   {Read: true, Write: false},
-			5:   {Read: true, Write: false},
-			6:   {Read: true, Write: false},
-			7:   {Read: true, Write: false},
-			8:   {Read: true, Write: false},
-			9:   {Read: true, Write: false},
-			10:  {Read: true, Write: false},
-			11:  {Read: true, Write: false},
-			12:  {Read: true, Write: false},
-			20:  {Read: true, Write: false},
-			21:  {Read: true, Write: true},
-			22:  {Read: true, Write: false},
-			23:  {Read: true, Write: true},
-			24:  {Read: true, Write: false},
-			30:  {Read: true, Write: false},
-			50:  {Read: true, Write: false},
-			100: {Read: true, Write: true},
-			101: {Read: false, Write: false},
-		}
+		p.memoryReadPermissions[0] = true
+		p.memoryReadPermissions[1] = true
+		p.memoryReadPermissions[2] = true
+		p.memoryReadPermissions[3] = true
+		p.memoryReadPermissions[4] = true
+		p.memoryReadPermissions[5] = true
+		p.memoryReadPermissions[6] = true
+		p.memoryReadPermissions[7] = true
+		p.memoryReadPermissions[8] = true
+		p.memoryReadPermissions[9] = true
+		p.memoryReadPermissions[10] = true
+		p.memoryReadPermissions[11] = true
+		p.memoryReadPermissions[12] = true
+		p.memoryReadPermissions[20] = true
+		p.memoryReadPermissions[21] = true
+		p.memoryReadPermissions[22] = true
+		p.memoryReadPermissions[23] = true
+		p.memoryReadPermissions[24] = true
+		p.memoryReadPermissions[30] = true
+		p.memoryReadPermissions[50] = true
+		p.memoryReadPermissions[100] = true
+		p.memoryReadPermissions[101] = false
+		p.memoryWritePermissions[0] = false
+		p.memoryWritePermissions[1] = false
+		p.memoryWritePermissions[2] = false
+		p.memoryWritePermissions[3] = false
+		p.memoryWritePermissions[4] = false
+		p.memoryWritePermissions[5] = false
+		p.memoryWritePermissions[6] = false
+		p.memoryWritePermissions[7] = false
+		p.memoryWritePermissions[8] = false
+		p.memoryWritePermissions[9] = false
+		p.memoryWritePermissions[10] = false
+		p.memoryWritePermissions[11] = false
+		p.memoryWritePermissions[12] = false
+		p.memoryWritePermissions[20] = false
+		p.memoryWritePermissions[21] = true
+		p.memoryWritePermissions[22] = false
+		p.memoryWritePermissions[23] = true
+		p.memoryWritePermissions[24] = false
+		p.memoryWritePermissions[30] = false
+		p.memoryWritePermissions[50] = false
+		p.memoryWritePermissions[100] = true
+		p.memoryWritePermissions[101] = false
 	default:
 		panic("unknown status")
 	}

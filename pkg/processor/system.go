@@ -17,7 +17,7 @@ func (p *Processor) Update(currentTime float64, deltaTime float64) {
 			continue
 		}
 		entity.Archetype.Initialize(i)
-    p.Entities[i].initialized = true
+		p.Entities[i].initialized = true
 	}
 	for i, entity := range p.Entities {
 		entity.Archetype.UpdateSequential(i)

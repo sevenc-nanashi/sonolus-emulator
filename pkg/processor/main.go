@@ -13,9 +13,11 @@ type Processor struct {
 	DrawCalls  []DrawCall
 	DebugLog   float64
 
-	memories          map[int][]float64
-	memoryPermissions map[int]MemoryPermission
-	EntityMemories    map[int]EntityMemories
+	memories               map[int][]float64
+	memoryReadPermissions  map[int]bool
+	memoryWritePermissions map[int]bool
+
+	EntityMemories map[int]EntityMemories
 
 	config ProcessorConfig
 }
@@ -29,6 +31,8 @@ func Init(config ProcessorConfig) Processor {
 		config: config,
 	}
 	rand.Seed(time.Now().UnixNano())
+  processor.memoryReadPermissions = map[int]bool{}
+  processor.memoryWritePermissions = map[int]bool{}
 
 	return processor
 }

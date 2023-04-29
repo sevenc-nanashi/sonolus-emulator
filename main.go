@@ -6,6 +6,9 @@ import (
 	"time"
 
 	_ "embed"
+	"net/http"
+
+	_ "net/http/pprof"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -61,6 +64,7 @@ func (g *Game) updateTouches() {
 	g.touches = newTouches
 	for i := range g.touches {
 		currentX, currentY := ebiten.CursorPosition()
+		g.touches[i].Status = processor.TouchStatusMiddle
 		lastX, lastY := g.touches[i].X, g.touches[i].Y
 		g.touches[i].X = float64(currentX)
 		g.touches[i].Y = float64(currentY)
@@ -98,6 +102,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		len(g.drawCalls),
 		g.processor.DebugLog,
 	))
+	return
 
 	for _, call := range g.drawCalls {
 		// op := &ebiten.DrawRectShaderOptions{}
@@ -176,6 +181,9 @@ func init() {
 	log.SetLevel(log.InfoLevel)
 }
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	ebiten.SetWindowSize(1280, 720)
 	ebiten.SetWindowTitle("Sonolus Emulator")
 
